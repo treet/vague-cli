@@ -1,0 +1,19 @@
+{
+	"name": "vague-cli",
+	"module": "index.ts",
+	"type": "module",
+	"bin": {
+		"vague": "index.ts"
+	},
+	"scripts": {
+		"check": "biome check",
+		"format": "biome check --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.15",
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}
