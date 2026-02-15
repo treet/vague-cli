@@ -55,24 +55,30 @@ const body: RequestBody = {
 
 if (values.debug) printDebug(body);
 
-const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-	method: "POST",
-	headers: { "Content-Type": "application/json" },
-	body: JSON.stringify(body),
-});
+try {
+	const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(body),
+	});
 
-if (!res.ok) {
-	console.error(`Ollama error: ${res.status} ${res.statusText}`);
+	if (!res.ok) {
+		console.error(`Ollama error: ${res.status} ${res.statusText}`);
+		process.exit(1);
+	}
+
+	const { response } = (await res.json()) as { response: string };
+
+	// The model is instructed to output plain text, but doesn't always listen.
+	const stripMarkdown = (s: string): string =>
+		s
+			.replace(/^```\w*\n?/gm, "")
+			.replace(/^`|`$/g, "")
+			.trim();
+
+	console.log(stripMarkdown(response));
+} catch (err) {
+	const message = err instanceof Error ? err.message : String(err);
+	console.error(`Error: ${message}`);
 	process.exit(1);
 }
-
-const { response } = (await res.json()) as { response: string };
-
-// The model is instructed to output plain text, but doesn't always listen.
-const stripMarkdown = (s: string): string =>
-	s
-		.replace(/^```\w*\n?/gm, "")
-		.replace(/^`|`$/g, "")
-		.trim();
-
-console.log(stripMarkdown(response));
